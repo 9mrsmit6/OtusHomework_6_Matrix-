@@ -1,25 +1,57 @@
 #include <iostream>
-#include <map>
 #include "Matrix.hpp"
 
 
 
 int main()
 {
-    Matrix<int, 3, -1> mat;
+    Matrix<int, 2, 0> mat;
 
-    mat[1][1][3]=222;
-    auto var=mat[1][1][3];
-    std::cout<<var;
+    for(int i{0};i!=10;i++)
+    {
+        mat[i][i]=i;
+        mat[i][9-i]=9-i;
+    }
+
+    std::cout<<"Matrix:"<<std::endl;
+
+    for(int i{1};i!=9;i++)
+    {
+        for(int k{1};k!=9;k++)
+        {
+            std::cout<<mat[i][k]<<' ';
+        }
+        std::cout<<std::endl;
+    }
+
+    std::cout<<std::endl;
+
+    std::cout<<"Size:"<<mat.size()<<std::endl<<std::endl;
+
+    for(const auto& [ar,v]:mat)
+    {
+        std::cout<<"(["<<ar[0]<<','<<ar[1]<<"] -> "<<v<<") "<<std::endl;
+    }
 
 
-//    std::array<int,2> k{1,1};
+    //Optional
+    Matrix<int, 5, 0> mat5;
 
-//    std::map<std::array<int,2>, int> tmap;
+    mat5[1][2][3][4][5]=12345;
+    mat5[1][2][3][4][6]=12346;
+    mat5[1][2][3][4][7]=12347;
 
-//    tmap[k]=123;
-//    auto var2=tmap[k];
 
-//    std::cout<<var2;
+    std::cout<<std::endl<<"---------------------------------------"<<std::endl;
+
+    std::cout<<mat5[1][2][3][4][5]<<std::endl;
+    std::cout<<mat5[1][2][3][4][6]<<std::endl;
+    std::cout<<mat5[1][2][3][4][7]<<std::endl;
+    std::cout<<mat5[1][2][3][4][8]<<std::endl<<std::endl;
+
+
+    ((mat5[1][2][3][4][8] = 314) = 0) = 217;
+    std::cout<<mat5[1][2][3][4][8]<<std::endl;
+
     return 0;
 }

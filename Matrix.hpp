@@ -1,7 +1,6 @@
 #ifndef MATRIX_HPP
 #define MATRIX_HPP
 
-#include <iostream>
 #include <array>
 #include <map>
 
@@ -26,17 +25,15 @@ struct Indexer
         {
             index[cnt]=i;
             cnt++;
-            std::cout<<"SAVE INDEX"<<std::endl;
         }
         return *this;
     }
 
-    Indexer& operator =( T&& value)
+    Indexer& operator =( const T& value)
     {
         if(cnt>=N)
         {
-            matrix.setValue(std::forward<T>(value));
-            std::cout<<"SAVE VAR"<<std::endl;
+            matrix.setValue(value);
         }
 
         return *this;
@@ -48,7 +45,6 @@ struct Indexer
     {
         if(cnt>=N)
         {
-            std::cout<<"PUSH VAR"<<std::endl;
             return matrix.getValue();
         }
 
@@ -80,11 +76,33 @@ struct Matrix
 
     }
 
+    ~Matrix() = default;
+
     Indexer<T,N,def>& operator[](unsigned int i)
     {
         indexer.startIndexing(i);
-        std::cout<<"START INDEXING"<<std::endl;
         return indexer;
+    }
+
+    std::size_t size()
+    {
+        return data.size();
+    }
+
+    const T& getFirst()
+    {
+        iterator=data.cbegin();
+        return *iterator;
+    }
+
+    auto begin()
+    {
+        return data.begin();
+    }
+
+    auto end()
+    {
+        return data.end();
     }
 
 
@@ -95,9 +113,11 @@ private:
     Indexer<T,N,def> indexer;
     std::map<std::array<unsigned int, N>, T> data;
 
+    decltype(data.cbegin()) iterator;
+
     const T defV{def};
 
-    void setValue(T&& value)
+    void setValue(const T& value)
     {
         if(value==def)
         {
@@ -105,7 +125,7 @@ private:
         }
         else
         {
-            data[indexer.index]=std::forward<T>(value);
+            data[indexer.index]=value;
         }
     }
 

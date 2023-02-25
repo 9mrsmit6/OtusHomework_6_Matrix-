@@ -7,6 +7,7 @@
 template <class T, std::size_t N, T def>
 struct Matrix;
 
+//!Реализует ввод и храниение индекса матрицы
 template <class T, std::size_t N, T def>
 struct Indexer
 {
@@ -66,7 +67,7 @@ private:
     Matrix<T,N,def>& matrix;
 };
 
-
+//!Реализует адаптацию интерфейса map к требуемому в задании
 template <class T, std::size_t N, T def>
 struct Matrix
 {
@@ -89,12 +90,6 @@ struct Matrix
         return data.size();
     }
 
-    const T& getFirst()
-    {
-        iterator=data.cbegin();
-        return *iterator;
-    }
-
     auto begin()
     {
         return data.begin();
@@ -112,8 +107,6 @@ private:
     friend class Indexer<T,N,def> ;
     Indexer<T,N,def> indexer;
     std::map<std::array<unsigned int, N>, T> data;
-
-    decltype(data.cbegin()) iterator;
 
     const T defV{def};
 

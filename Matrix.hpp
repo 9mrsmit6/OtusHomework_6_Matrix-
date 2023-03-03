@@ -3,6 +3,7 @@
 
 #include <array>
 #include <map>
+#include <cassert>
 
 template <class T, std::size_t N, T def>
 struct Matrix;
@@ -22,6 +23,7 @@ struct Indexer
 
     Indexer& operator [](unsigned int i)
     {
+        assert((void("Incorrect matrix dimension (larger)"), cnt<N));
         if(cnt<N)
         {
             index[cnt]=i;
@@ -32,6 +34,9 @@ struct Indexer
 
     Indexer& operator =( const T& value)
     {
+        //проверяю кореектность размерности матрицы.
+        //Можно было бы бросить исключение, но считаю это лишним. т.к. при отладке эта ошибка всеравно всплывет в assert (количество вызовов [] жестко задана в программе как правило)
+        assert((void("Incorrect matrix dimension (less)"), cnt>=N));
         if(cnt>=N)
         {
             matrix.setValue(value);
@@ -44,6 +49,7 @@ struct Indexer
 
     operator T() const
     {
+
         if(cnt>=N)
         {
             return matrix.getValue();

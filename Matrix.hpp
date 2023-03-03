@@ -2,139 +2,112 @@
 #define MATRIX_HPP
 
 #include <array>
+#include <vector>
 #include <map>
 
-template <class T, std::size_t N, T def>
-struct Matrix;
+using ID    =std::vector<std::size_t>;
 
-//!Реализует ввод и храниение индекса матрицы
-template <class T, std::size_t N, T def>
+template<class T>
+using MAP   =std::map<ID, T>;
+
+template <std::size_t C, std::size_t N>
+concept IndexConcept = (C<N);
+
+
+template <std::size_t C, std::size_t N>
+concept GetSetConcept = (C==N);
+
+
+
+template <class T, std::size_t C, std::size_t N, T def>
 struct Indexer
 {
-
-    Indexer(Matrix<T,N,def>& matrix_):
-        matrix{matrix_}
+    Indexer
+    (
+            ID& indexVector_,
+            MAP<T>& map_
+    ):
+        indexVector{indexVector_},
+        map(map_)
     {
-
     }
 
-    ~Indexer() = default;
 
-    Indexer& operator [](unsigned int i)
+    auto operator [](unsigned int i) requires IndexConcept<C,N>
     {
-        if(cnt<N)
+        indexVector.push_back(i);
+        return Indexer<T,C+1,N, def>{indexVector, map};
+    }
+
+    auto operator =( const T& value) requires GetSetConcept<C,N>
+    {
+        if(value==def)
         {
-            index[cnt]=i;
-            cnt++;
+            map.erase(indexVector);
         }
-        return *this;
-    }
-
-    Indexer& operator =( const T& value)
-    {
-        if(cnt>=N)
+        else
         {
-            matrix.setValue(value);
-        }
-
-        return *this;
-
-
-    }
-
-    operator T() const
-    {
-        if(cnt>=N)
-        {
-            return matrix.getValue();
+            map[indexVector]=value;
         }
 
-        return matrix.defV;
+        return Indexer<T,C,N, def>{indexVector, map};
     }
 
-    void startIndexing(unsigned int i)
+    operator T() const requires GetSetConcept<C,N>
     {
-        cnt=0;
-        index[cnt]=i;
-        cnt++;
+
+        if(map.contains(indexVector))
+        {
+            return map[indexVector];
+        }
+        else
+        {
+            return def;
+        }
     }
 
+    private:
 
-private:
-    friend class Matrix<T,N,def>;
-    std::array<unsigned int, N> index;
-    unsigned int cnt{0};
-    Matrix<T,N,def>& matrix;
+    ID& indexVector;
+    MAP<T>& map;
 };
 
-//!Реализует адаптацию интерфейса map к требуемому в задании
+
 template <class T, std::size_t N, T def>
 struct Matrix
 {
-    Matrix():
-        indexer(*this)
-    {
-
-    }
-
+    Matrix() = default;
     ~Matrix() = default;
 
-    Indexer<T,N,def>& operator[](unsigned int i)
+    auto operator[](unsigned int i)
     {
-        indexer.startIndexing(i);
-        return indexer;
+        index.clear();
+        index.push_back(i);
+        return Indexer<T,1,N,def>{index, map};
     }
 
     std::size_t size()
     {
-        return data.size();
+        return map.size();
     }
 
     auto begin()
     {
-        return data.begin();
+        return map.begin();
     }
 
     auto end()
     {
-        return data.end();
+        return map.end();
     }
-
-
 
 
 private:
-    friend class Indexer<T,N,def> ;
-    Indexer<T,N,def> indexer;
-    std::map<std::array<unsigned int, N>, T> data;
-
-    const T defV{def};
-
-    void setValue(const T& value)
-    {
-        if(value==def)
-        {
-            data.erase(indexer.index);
-        }
-        else
-        {
-            data[indexer.index]=value;
-        }
-    }
-
-    const T& getValue()
-    {
-        if(data.contains(indexer.index))
-        {
-            return data[indexer.index];
-        }
-        else
-        {
-            return defV;
-        }
-    }
+    ID index;
+    MAP<T> map;
 
 };
+
 
 
 #endif // MATRIX_HPP
